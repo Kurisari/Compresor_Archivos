@@ -7,6 +7,7 @@ class CompresorArchivoApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Compresor de Archivos")
+        root.iconbitmap("H:\My Drive\programacion\Compresor_Archivos\Compresor_Archivos\src\icon.ico")
         self.root.geometry("300x200")
         self.archivo_a_comprimir = tk.StringVar()
         self.lbl_archivo = tk.Label(root, text="Selecciona el archivo a comprimir:")
