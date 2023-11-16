@@ -1,5 +1,10 @@
 import tkinter as tk
 from tkinter import filedialog
+import os
+import sys
+script_dir = os.getcwd()
+func_dir = os.path.join(script_dir)
+sys.path.append(func_dir)
 from func import comprimir
 from func import descomprimir
 
