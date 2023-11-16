@@ -12,6 +12,7 @@ class CompresorArchivoApp:
         self.lbl_archivo = tk.Label(root, text="Selecciona el archivo a comprimir:")
         self.lbl_archivo.pack(pady=10)
         self.entry_archivo = tk.Entry(root, textvariable=self.archivo_a_comprimir, width=40)
+        self.entry_archivo.config(state="disabled")
         self.entry_archivo.pack(pady=10)
         self.btn_seleccionar = tk.Button(root, text="Seleccionar Archivo", command=self.seleccionar_archivo)
         self.btn_seleccionar.pack(pady=10)
