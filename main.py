@@ -1,7 +1,5 @@
 import tkinter as tk
 from tkinter import filedialog
-import shutil
-import os
 from func import comprimir
 from func import descomprimir
 
