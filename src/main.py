@@ -10,6 +10,8 @@ from func import descomprimir
 
 class CompresorArchivoApp:
     def __init__(self, root):
+        self.huffman = comprimir.HuffmanTree()
+        self.archivo = ""
         self.root = root
         self.root.title("Compresor de Archivos")
         root.iconbitmap("H:\My Drive\programacion\Compresor_Archivos\Compresor_Archivos\src\icon.ico")
@@ -28,12 +30,17 @@ class CompresorArchivoApp:
         self.btn_descomprimir.pack(side="right", padx=10)
 
     def seleccionar_archivo(self):
-        archivo = filedialog.askopenfilename(initialdir="/", title="Seleccionar Archivo",
+        self.archivo = filedialog.askopenfilename(initialdir="/", title="Seleccionar Archivo",
                                             filetypes=(("Todos los archivos", "*.*"), ("Archivos de texto", "*.txt")))
-        self.archivo_a_comprimir.set(archivo)
+        self.archivo_a_comprimir.set(self.archivo)
+        
 
     def comprimir_archivo(self):
-        pass
+        output_file = self.archivo.replace("archivo.txt", "compressed.txt")
+        self.huffman.process_text(self.archivo)
+        self.huffman.generate_huffman_codes(self.huffman.root)
+        self.huffman.compress_file(self.archivo, output_file)
+        print("listo")
     
     def descomprimir_archivo(self):
         pass
