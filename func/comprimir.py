@@ -59,24 +59,3 @@ class HuffmanTree:
         compressed_content.encode({char: bitarray(code) for char, code in self.huffman_codes.items()}, content)
         with open(output_file, 'wb') as file:
             compressed_content.tofile(file)
-
-    def decompress_file(self, input_file, output_file):
-        with open(input_file, 'rb') as file:
-            compressed_content = bitarray()
-            compressed_content.fromfile(file)
-        decompressed_content = self.decode_huffman(compressed_content)
-        with open(output_file, 'w') as file:
-            file.write(decompressed_content)
-
-    def decode_huffman(self, compressed_content):
-        current_node = self.root
-        decompressed_content = []
-        for bit in compressed_content:
-            if bit:
-                current_node = current_node.right
-            else:
-                current_node = current_node.left
-            if current_node.is_leaf():
-                decompressed_content.append(current_node.char)
-                current_node = self.root
-        return ''.join(decompressed_content)

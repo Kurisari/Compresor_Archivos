@@ -11,6 +11,7 @@ from func import descomprimir
 class CompresorArchivoApp:
     def __init__(self, root):
         self.huffman = comprimir.HuffmanTree()
+        self.huffmanDecode = descomprimir.HuffmanDecoder()
         self.archivo = ""
         self.root = root
         self.root.title("Compresor de Archivos")
@@ -43,7 +44,9 @@ class CompresorArchivoApp:
         print("listo")
     
     def descomprimir_archivo(self):
-        pass
+        output_file = "C:/Users/crisa/Downloads/original.txt"
+        self.huffmanDecode.decompress_file(self.archivo, output_file)
+        print("listo")
 
 if __name__ == "__main__":
     root = tk.Tk()
