@@ -38,13 +38,19 @@ class CompresorArchivoApp:
 
     def comprimir_archivo(self):
         output_file = self.archivo.replace("archivo.txt", "compressed.txt")
+        tree_file = self.archivo.replace("archivo.txt", "huffman_tree.txt")
         self.huffman.process_text(self.archivo)
         self.huffman.generate_huffman_codes(self.huffman.root)
+        with open(tree_file, 'wb') as tree_file:
+            self.huffman.serialize_huffman_tree(tree_file)
         self.huffman.compress_file(self.archivo, output_file)
         print("listo")
     
     def descomprimir_archivo(self):
         output_file = "C:/Users/crisa/Downloads/original.txt"
+        tree_file = self.archivo.replace("compressed.txt", "huffman_tree.txt")
+        with open(tree_file, 'rb') as tree_file:
+            self.huffmanDecode.deserialize_huffman_tree(tree_file)
         self.huffmanDecode.decompress_file(self.archivo, output_file)
         print("listo")
 
