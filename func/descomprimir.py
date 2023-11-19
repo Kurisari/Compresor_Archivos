@@ -1,4 +1,5 @@
 import heapq
+import pickle
 from bitarray import bitarray
 
 class HuffmanNode:
@@ -31,6 +32,9 @@ class HuffmanDecoder:
         else:
             self.root = None
             self.huffman_codes = {}
+    
+    def deserialize_huffman_tree(self, file):
+        self.root = pickle.load(file)
     
     def decompress_file(self, input_file, output_file):
         with open(input_file, 'rb') as file:
