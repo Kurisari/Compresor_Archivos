@@ -1,4 +1,5 @@
 import heapq
+import pickle
 from bitarray import bitarray
 
 class HuffmanNode:
@@ -40,7 +41,10 @@ class HuffmanTree:
             self.huffman_codes[node.char] = current_code
         self.generate_huffman_codes(node.left, current_code + "0")
         self.generate_huffman_codes(node.right, current_code + "1")
-        
+    
+    def serialize_huffman_tree(self, file):
+        pickle.dump(self.root, file)
+    
     def process_text(self, file_path):
         char_freq = {}
         with open(file_path, 'r') as file:
