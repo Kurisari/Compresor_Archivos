@@ -25,16 +25,18 @@ class CompresorArchivoApp:
         self.entry_archivo.pack(pady=10)
         self.btn_seleccionar = tk.Button(root, text="Seleccionar Archivo", command=self.seleccionar_archivo)
         self.btn_seleccionar.pack(pady=10)
-        self.btn_comprimir = tk.Button(root, text="Comprimir Archivo", command=self.comprimir_archivo)
+        self.btn_comprimir = tk.Button(root, text="Comprimir Archivo", command=self.comprimir_archivo, state="disabled")
         self.btn_comprimir.pack(side="left", padx=10)
-        self.btn_descomprimir = tk.Button(root, text="Descomprimir Archivo", command=self.descomprimir_archivo)
+        self.btn_descomprimir = tk.Button(root, text="Descomprimir Archivo", command=self.descomprimir_archivo, state="disabled")
         self.btn_descomprimir.pack(side="right", padx=10)
 
     def seleccionar_archivo(self):
         self.archivo = filedialog.askopenfilename(initialdir="/", title="Seleccionar Archivo",
                                             filetypes=(("Todos los archivos", "*.*"), ("Archivos de texto", "*.txt")))
         self.archivo_a_comprimir.set(self.archivo)
-        
+        if self.archivo:
+            self.btn_comprimir.config(state="normal")
+            self.btn_descomprimir.config(state="normal")
 
     def comprimir_archivo(self):
         file_name = os.path.splitext(os.path.basename(self.archivo))[0]
