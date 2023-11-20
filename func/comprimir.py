@@ -60,17 +60,25 @@ class HuffmanTree:
 
     def process_image(self, image_path):
         char_freq = {}
-        with Image.open(image_path) as img:
-            pixels = list(img.getdata())
-            for pixel in pixels:
-                if pixel in char_freq:
-                    char_freq[pixel] += 1
+        with open(image_path, 'rb') as img_file:
+            image_data = img_file.read()
+            for byte in image_data:
+                if byte in char_freq:
+                    char_freq[byte] += 1
                 else:
-                    char_freq[pixel] = 1
+                    char_freq[byte] = 1
         return char_freq
 
     def compress_file(self, input_file, output_file):
         with open(input_file, 'r') as file:
+            content = file.read()
+        compressed_content = bitarray()
+        compressed_content.encode({char: bitarray(code) for char, code in self.huffman_codes.items()}, content)
+        with open(output_file, 'wb') as file:
+            compressed_content.tofile(file)
+    
+    def compress_img_file(self, input_file, output_file):
+        with open(input_file, 'rb') as file:
             content = file.read()
         compressed_content = bitarray()
         compressed_content.encode({char: bitarray(code) for char, code in self.huffman_codes.items()}, content)

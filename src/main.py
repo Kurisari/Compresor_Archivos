@@ -66,7 +66,7 @@ class CompresorArchivoApp:
                 self.huffman_img.generate_huffman_codes(self.huffman_img.root)
                 with open(tree_file, 'wb') as tree_file:
                     self.huffman_img.serialize_huffman_tree(tree_file)
-                self.huffman_img.compress_file(self.archivo, output_file)
+                self.huffman_img.compress_img_file(self.archivo, output_file)
             else:
                 raise ValueError("Unsupported file type")
             self.afirmative_message("Compresion exitosa")
