@@ -1,6 +1,7 @@
 import heapq
 import pickle
 from bitarray import bitarray
+from PIL import Image
 
 class HuffmanNode:
     def __init__(self, char, freq):
@@ -18,6 +19,7 @@ class HuffmanNode:
 
 class HuffmanTree:
     def __init__(self, char_freq=None):
+        self.huffman_codes = {}
         if char_freq is not None:
             self.nodes = [HuffmanNode(char, freq) for char, freq in char_freq.items()]
             heapq.heapify(self.nodes)
@@ -55,6 +57,17 @@ class HuffmanTree:
                 else:
                     char_freq[char] = 1
         self.__init__(char_freq)
+
+    def process_image(self, image_path):
+        char_freq = {}
+        with Image.open(image_path) as img:
+            pixels = list(img.getdata())
+            for pixel in pixels:
+                if pixel in char_freq:
+                    char_freq[pixel] += 1
+                else:
+                    char_freq[pixel] = 1
+        return char_freq
 
     def compress_file(self, input_file, output_file):
         with open(input_file, 'r') as file:
