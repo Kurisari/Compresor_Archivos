@@ -38,7 +38,9 @@ class CompresorArchivoApp:
 
     def seleccionar_archivo(self):
         self.archivo = filedialog.askopenfilename(initialdir="/", title="Seleccionar Archivo",
-                                            filetypes=(("Todos los archivos", "*.*"), ("Archivos de texto", "*.txt")))
+                                            filetypes=(("Todos los archivos", "*.*"),
+                                                        ("Archivos de texto", "*.txt"), 
+                                                        ("Archivos de imagen", "*.png;*.jpg;*.jpeg")))
         self.archivo_a_comprimir.set(self.archivo)
         if self.archivo:
             self.btn_comprimir.config(state="normal")
@@ -46,30 +48,52 @@ class CompresorArchivoApp:
 
     def comprimir_archivo(self):
         try:
-            file_name = os.path.splitext(os.path.basename(self.archivo))[0]
+            file_name, file_extension = os.path.splitext(os.path.basename(self.archivo))
             file_path = os.path.dirname(self.archivo)
-            output_file = os.path.join(file_path, f"{file_name}_compressed.txt")
-            tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
-            self.huffman.process_text(self.archivo)
-            self.huffman.generate_huffman_codes(self.huffman.root)
-            with open(tree_file, 'wb') as tree_file:
-                self.huffman.serialize_huffman_tree(tree_file)
-            self.huffman.compress_file(self.archivo, output_file)
+            if file_extension.lower() == ".txt":
+                output_file = os.path.join(file_path, f"{file_name}_compressed.txt")
+                tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
+                self.huffman.process_text(self.archivo)
+                self.huffman.generate_huffman_codes(self.huffman.root)
+                with open(tree_file, 'wb') as tree_file:
+                    self.huffman.serialize_huffman_tree(tree_file)
+                self.huffman.compress_file(self.archivo, output_file)
+            elif file_extension.lower() in [".png", ".jpg", ".jpeg"]:
+                output_file = os.path.join(file_path, f"{file_name}_compressed.png")
+                tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
+                char_freq = self.huffman.process_image(self.archivo)
+                self.huffman_img = comprimir.HuffmanTree(char_freq)
+                self.huffman_img.generate_huffman_codes(self.huffman_img.root)
+                with open(tree_file, 'wb') as tree_file:
+                    self.huffman_img.serialize_huffman_tree(tree_file)
+                self.huffman_img.compress_file(self.archivo, output_file)
+            else:
+                raise ValueError("Unsupported file type")
             self.afirmative_message("Compresion exitosa")
         except Exception as e:
             self.error_message(e)
     
     def descomprimir_archivo(self):
         try:
-            file_name = os.path.splitext(os.path.basename(self.archivo))[0]
+            file_name, file_extension = os.path.splitext(os.path.basename(self.archivo))
             file_path = os.path.dirname(self.archivo)
-            output_file = os.path.join(file_path, f"{file_name}_decompressed.txt")
-            tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
-            output_file = output_file.replace("_compressed", "")
-            tree_file = tree_file.replace("_compressed", "")
-            with open(tree_file, 'rb') as tree_file:
-                self.huffmanDecode.deserialize_huffman_tree(tree_file)
-            self.huffmanDecode.decompress_file(self.archivo, output_file)
+            if file_extension.lower() == ".txt":
+                output_file = os.path.join(file_path, f"{file_name}_decompressed.txt")
+                tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
+                output_file = output_file.replace("_compressed", "")
+                tree_file = tree_file.replace("_compressed", "")
+                with open(tree_file, 'rb') as tree_file:
+                    self.huffmanDecode.deserialize_huffman_tree(tree_file)
+                self.huffmanDecode.decompress_file(self.archivo, output_file)
+            elif file_extension.lower() in [".png", ".jpg", ".jpeg"]:
+                output_file = os.path.join(file_path, f"{file_name}_decompressed.png")
+                tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
+                tree_file = tree_file.replace("_compressed", "")
+                with open(tree_file, 'rb') as tree_file:
+                    self.huffmanDecode.deserialize_huffman_tree(tree_file)
+                self.huffmanDecode.decompress_file(self.archivo, output_file)
+            else:
+                raise ValueError("Unsupported file type")
             self.afirmative_message("Descompresion exitosa")
         except Exception as e:
             self.error_message(e)
