@@ -1,7 +1,7 @@
 import heapq
 import pickle
 from bitarray import bitarray
-from PIL import Image
+import imageio
 
 class HuffmanNode:
     def __init__(self, char, freq):
@@ -68,6 +68,20 @@ class HuffmanTree:
                 else:
                     char_freq[byte] = 1
         return char_freq
+    
+    def process_video(self, video_path):
+        frames = []
+        with imageio.get_reader(video_path, 'ffmpeg') as video:
+            for frame in video:
+                frames.extend(frame.tobytes())
+        char_freq = {}
+        for char in frames:
+            if char in char_freq:
+                char_freq[char] += 1
+            else:
+                char_freq[char] = 1
+        self.__init__(char_freq)
+        return frames
 
     def compress_file(self, input_file, output_file):
         with open(input_file, 'r') as file:
@@ -84,3 +98,9 @@ class HuffmanTree:
         compressed_content.encode({char: bitarray(code) for char, code in self.huffman_codes.items()}, content)
         with open(output_file, 'wb') as file:
             compressed_content.tofile(file)
+    
+    def compress_video_file(self, input_file, output_file):
+        compressed_frames = bitarray()
+        compressed_frames.encode(self.huffman_codes, self.process_video(input_file))
+        with open(output_file, 'wb') as file:
+            pickle.dump(compressed_frames, file)
