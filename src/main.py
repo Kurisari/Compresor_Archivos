@@ -91,7 +91,7 @@ class CompresorArchivoApp:
                 tree_file = tree_file.replace("_compressed", "")
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree(tree_file)
-                self.huffmanDecode.decompress_file(self.archivo, output_file)
+                self.huffmanDecode.decompress_img_file(self.archivo, output_file)
             else:
                 raise ValueError("Unsupported file type")
             self.afirmative_message("Descompresion exitosa")
