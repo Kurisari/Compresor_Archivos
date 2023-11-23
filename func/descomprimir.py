@@ -35,6 +35,9 @@ class HuffmanDecoder:
     
     def deserialize_huffman_tree(self, file):
         self.root = pickle.load(file)
+        
+    def deserialize_huffman_tree_aud(self, file):
+        self.root = pickle.load(file)
     
     def decompress_file(self, input_file, output_file):
         with open(input_file, 'rb') as file:
@@ -59,6 +62,14 @@ class HuffmanDecoder:
         decompressed_content = self.decode_huffman_img(compressed_content)
         with open(output_file, 'wb') as file:
             file.write(decompressed_content)
+    
+    def decompress_audio_file(self, input_file, output_file):
+        with open(input_file, 'rb') as file:
+            compressed_content = bitarray()
+            compressed_content.fromfile(file)
+        decompressed_content = self.decode_huffman_aud(compressed_content)
+        with open(output_file, 'wb') as file:
+            file.write(decompressed_content)
 
     def decode_huffman(self, compressed_content):
         current_node = self.root
@@ -74,6 +85,19 @@ class HuffmanDecoder:
         return ''.join(decompressed_content)
     
     def decode_huffman_img(self, compressed_content):
+        current_node = self.root
+        decompressed_content = bytearray()
+        for bit in compressed_content:
+            if bit:
+                current_node = current_node.right
+            else:
+                current_node = current_node.left
+            if current_node.is_leaf():
+                decompressed_content.append(current_node.char)
+                current_node = self.root
+        return bytes(decompressed_content)
+    
+    def decode_huffman_aud(self, compressed_content):
         current_node = self.root
         decompressed_content = bytearray()
         for bit in compressed_content:
