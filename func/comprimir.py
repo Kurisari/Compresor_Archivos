@@ -68,17 +68,14 @@ class HuffmanTree:
         return char_freq
     
     def process_video(self, video_path):
-        frames = b''
-        with imageio.get_reader(video_path, 'ffmpeg') as video:
-            for frame in video:
-                frames += frame.tobytes()
         char_freq = {}
-        for char in frames:
-            if char in char_freq:
-                char_freq[char] += 1
-            else:
-                char_freq[char] = 1
-        self.__init__(char_freq)
+        with open(video_path, 'rb') as video_file:
+            video_data = video_file.read()
+            for byte in video_data:
+                if byte in char_freq:
+                    char_freq[byte] += 1
+                else:
+                    char_freq[byte] = 1
         return char_freq
     
     def process_audio(self, audio_path):
@@ -112,9 +109,9 @@ class HuffmanTree:
         with open(input_file, 'rb') as file:
             content = file.read()
         compressed_content = bitarray()
-        compressed_content.encode({char: bitarray(code) for char, code in self.huffman_codes.items()}, content)
+        compressed_content.encode({byte: bitarray(code) for byte, code in self.huffman_codes.items()}, content)
         with open(output_file, 'wb') as file:
-            file.write(compressed_content.tobytes())
+            compressed_content.tofile(file)
     
     def compress_audio_file(self, input_file, output_file):
         with open(input_file, 'rb') as file:
