@@ -19,20 +19,22 @@ class HuffmanNode:
 class HuffmanTree:
     def __init__(self, char_freq=None):
         self.huffman_codes = {}
+        self.root = None
         if char_freq is not None:
             self.nodes = [HuffmanNode(char, freq) for char, freq in char_freq.items()]
             heapq.heapify(self.nodes)
-            while len(self.nodes) > 1:
-                left_node = heapq.heappop(self.nodes)
-                right_node = heapq.heappop(self.nodes)
-                internal_node = HuffmanNode(None, left_node.freq + right_node.freq)
-                internal_node.left = left_node
-                internal_node.right = right_node
-                heapq.heappush(self.nodes, internal_node)
-            self.root = self.nodes[0]
-        else:
-            self.root = None
-            self.huffman_codes = {}
+            self.build_huffman_tree()
+
+    def build_huffman_tree(self):
+        while len(self.nodes) > 1:
+            left_node = heapq.heappop(self.nodes)
+            right_node = heapq.heappop(self.nodes)
+            internal_node = HuffmanNode(None, left_node.freq + right_node.freq)
+            internal_node.left = left_node
+            internal_node.right = right_node
+            heapq.heappush(self.nodes, internal_node)
+        self.root = self.nodes[0]
+        self.generate_huffman_codes(self.root)
 
     def generate_huffman_codes(self, node, current_code=""):
         if node is None:
