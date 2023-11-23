@@ -72,9 +72,10 @@ class CompresorArchivoApp:
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 frames = self.huffman.process_video(self.archivo)
                 self.huffman_vid = comprimir.HuffmanTree(frames)
+                self.huffman_vid.generate_huffman_codes(self.huffman_vid.root)
                 with open(tree_file, 'wb') as tree_file:
                     self.huffman_vid.serialize_huffman_tree(tree_file)
-                self.huffman.compress_video_file(self.archivo, output_file)
+                self.huffman_vid.compress_video_file(self.archivo, output_file)
             else:
                 raise ValueError("Unsupported file type")
             self.afirmative_message("Compresion exitosa")
@@ -100,6 +101,13 @@ class CompresorArchivoApp:
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree(tree_file)
                 self.huffmanDecode.decompress_img_file(self.archivo, output_file)
+            elif file_extension.lower() in [".crmp4", ".cravi", ".crmkv"]:
+                output_file = os.path.join(file_path, f"{file_name}_decompressed.mp4")
+                tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
+                tree_file = tree_file.replace("_compressed", "")
+                with open(tree_file, 'rb') as tree_file:
+                    self.huffmanDecode.deserialize_huffman_tree(tree_file)
+                self.huffmanDecode.decompress_vid_file(self.archivo, output_file)
             else:
                 raise ValueError("Unsupported file type")
             self.afirmative_message("Descompresion exitosa")
