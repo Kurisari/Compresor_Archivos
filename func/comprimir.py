@@ -29,7 +29,6 @@ class HuffmanTree:
                 internal_node.left = left_node
                 internal_node.right = right_node
                 heapq.heappush(self.nodes, internal_node)
-
             self.root = self.nodes[0]
         else:
             self.root = None
@@ -81,6 +80,17 @@ class HuffmanTree:
                 char_freq[char] = 1
         self.__init__(char_freq)
         return char_freq
+    
+    def process_audio(self, audio_path):
+        char_freq = {}
+        with open(audio_path, 'rb') as audio_file:
+            audio_data = audio_file.read()
+            for byte in audio_data:
+                if byte in char_freq:
+                    char_freq[byte] += 1
+                else:
+                    char_freq[byte] = 1
+        return char_freq
 
     def compress_file(self, input_file, output_file):
         with open(input_file, 'r') as file:
@@ -105,3 +115,11 @@ class HuffmanTree:
         compressed_content.encode({char: bitarray(code) for char, code in self.huffman_codes.items()}, content)
         with open(output_file, 'wb') as file:
             file.write(compressed_content.tobytes())
+    
+    def compress_audio_file(self, input_file, output_file):
+        with open(input_file, 'rb') as file:
+            content = file.read()
+        compressed_content = bitarray()
+        compressed_content.encode({byte: bitarray(code) for byte, code in self.huffman_codes.items()}, content)
+        with open(output_file, 'wb') as file:
+            compressed_content.tofile(file)
