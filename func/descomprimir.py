@@ -51,6 +51,14 @@ class HuffmanDecoder:
         decompressed_content = self.decode_huffman_img(compressed_content)
         with open(output_file, 'wb') as file:
             file.write(decompressed_content)
+    
+    def decompress_vid_file(self, input_file, output_file):
+        with open(input_file, 'rb') as file:
+            compressed_content = bitarray()
+            compressed_content.fromfile(file)
+        decompressed_content = self.decode_huffman_img(compressed_content)
+        with open(output_file, 'wb') as file:
+            file.write(decompressed_content)
 
     def decode_huffman(self, compressed_content):
         current_node = self.root
