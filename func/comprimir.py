@@ -16,7 +16,6 @@ class HuffmanNode:
     def is_leaf(self):
         return self.left is None and self.right is None
 
-
 class HuffmanTree:
     def __init__(self, char_freq=None):
         self.huffman_codes = {}
@@ -81,7 +80,7 @@ class HuffmanTree:
             else:
                 char_freq[char] = 1
         self.__init__(char_freq)
-        return frames
+        return char_freq
 
     def compress_file(self, input_file, output_file):
         with open(input_file, 'r') as file:
@@ -100,7 +99,9 @@ class HuffmanTree:
             compressed_content.tofile(file)
     
     def compress_video_file(self, input_file, output_file):
-        compressed_frames = bitarray()
-        compressed_frames.encode(self.huffman_codes, self.process_video(input_file))
+        with open(input_file, 'rb') as file:
+            content = file.read()
+        compressed_content = bitarray()
+        compressed_content.encode({char: bitarray(code) for char, code in self.huffman_codes.items()}, content)
         with open(output_file, 'wb') as file:
-            pickle.dump(compressed_frames, file)
+            compressed_content.tofile(file)
