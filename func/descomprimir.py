@@ -59,7 +59,7 @@ class HuffmanDecoder:
         with open(input_file, 'rb') as file:
             compressed_content = bitarray()
             compressed_content.fromfile(file)
-        decompressed_content = self.decode_huffman_img(compressed_content)
+        decompressed_content = self.decode_huffman_aud(compressed_content)
         with open(output_file, 'wb') as file:
             file.write(decompressed_content)
     
