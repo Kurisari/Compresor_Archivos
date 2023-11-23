@@ -76,6 +76,15 @@ class CompresorArchivoApp:
                 with open(tree_file, 'wb') as tree_file:
                     self.huffman_vid.serialize_huffman_tree(tree_file)
                 self.huffman_vid.compress_video_file(self.archivo, output_file)
+            elif file_extension.lower() in [".mp3", ".wav", ".ogg"]:
+                output_file = os.path.join(file_path, f"{file_name}_compressed.crmp3")
+                tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
+                char_freq = self.huffman.process_audio(self.archivo)
+                self.huffman_audio = comprimir.HuffmanTree(char_freq)
+                self.huffman_audio.generate_huffman_codes(self.huffman_audio.root)
+                with open(tree_file, 'wb') as tree_file:
+                    self.huffman_audio.serialize_huffman_tree(tree_file)
+                self.huffman_audio.compress_audio_file(self.archivo, output_file)
             else:
                 raise ValueError("Unsupported file type")
             self.afirmative_message("Compresion exitosa")
@@ -83,7 +92,7 @@ class CompresorArchivoApp:
             self.error_message(e)
     
     def descomprimir_archivo(self):
-        try:
+        
             file_name, file_extension = os.path.splitext(os.path.basename(self.archivo))
             file_path = os.path.dirname(self.archivo)
             if file_extension.lower() == ".crtxt":
@@ -108,11 +117,18 @@ class CompresorArchivoApp:
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree(tree_file)
                 self.huffmanDecode.decompress_vid_file(self.archivo, output_file)
+            elif file_extension.lower() == ".crmp3":
+                output_file = os.path.join(file_path, f"{file_name}_decompressed.mp3")
+                tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
+                tree_file = tree_file.replace("_compressed", "")
+                with open(tree_file, 'rb') as tree_file:
+                    self.huffmanDecode.deserialize_huffman_tree_aud(tree_file)
+                self.huffmanDecode.decompress_audio_file(self.archivo, output_file)
             else:
                 raise ValueError("Unsupported file type")
             self.afirmative_message("Descompresion exitosa")
-        except Exception as e:
-            self.error_message(e)
+        # except Exception as e:
+        #     self.error_message(e)
 
 if __name__ == "__main__":
     root = tk.Tk()
