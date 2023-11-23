@@ -59,7 +59,7 @@ class CompresorArchivoApp:
                     self.huffman.serialize_huffman_tree(tree_file)
                 self.huffman.compress_file(self.archivo, output_file)
             elif file_extension.lower() in [".png", ".jpg", ".jpeg"]:
-                output_file = os.path.join(file_path, f"{file_name}_compressed.crpng")
+                output_file = os.path.join(file_path, f"{file_name}_compressed.crimg")
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 char_freq = self.huffman.process_image(self.archivo)
                 self.huffman_img = comprimir.HuffmanTree(char_freq)
@@ -68,7 +68,7 @@ class CompresorArchivoApp:
                     self.huffman_img.serialize_huffman_tree(tree_file)
                 self.huffman_img.compress_img_file(self.archivo, output_file)
             elif file_extension.lower() in [".mp4", ".avi", ".mkv"]:
-                output_file = os.path.join(file_path, f"{file_name}_compressed.crmp4")
+                output_file = os.path.join(file_path, f"{file_name}_compressed.crvid")
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 frames = self.huffman.process_video(self.archivo)
                 self.huffman_vid = comprimir.HuffmanTree(frames)
@@ -77,7 +77,7 @@ class CompresorArchivoApp:
                     self.huffman_vid.serialize_huffman_tree(tree_file)
                 self.huffman_vid.compress_video_file(self.archivo, output_file)
             elif file_extension.lower() in [".mp3", ".wav", ".ogg"]:
-                output_file = os.path.join(file_path, f"{file_name}_compressed.crmp3")
+                output_file = os.path.join(file_path, f"{file_name}_compressed.craud")
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 char_freq = self.huffman.process_audio(self.archivo)
                 self.huffman_audio = comprimir.HuffmanTree(char_freq)
@@ -92,7 +92,7 @@ class CompresorArchivoApp:
             self.error_message(e)
     
     def descomprimir_archivo(self):
-        
+        try:
             file_name, file_extension = os.path.splitext(os.path.basename(self.archivo))
             file_path = os.path.dirname(self.archivo)
             if file_extension.lower() == ".crtxt":
@@ -103,21 +103,21 @@ class CompresorArchivoApp:
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree(tree_file)
                 self.huffmanDecode.decompress_file(self.archivo, output_file)
-            elif file_extension.lower() in [".crpng", ".crjpg", ".crjpeg"]:
+            elif file_extension.lower() == ".crimg":
                 output_file = os.path.join(file_path, f"{file_name}_decompressed.png")
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 tree_file = tree_file.replace("_compressed", "")
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree(tree_file)
                 self.huffmanDecode.decompress_img_file(self.archivo, output_file)
-            elif file_extension.lower() in [".crmp4", ".cravi", ".crmkv"]:
+            elif file_extension.lower() == ".crvid":
                 output_file = os.path.join(file_path, f"{file_name}_decompressed.mp4")
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 tree_file = tree_file.replace("_compressed", "")
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree(tree_file)
                 self.huffmanDecode.decompress_vid_file(self.archivo, output_file)
-            elif file_extension.lower() == ".crmp3":
+            elif file_extension.lower() == ".craud":
                 output_file = os.path.join(file_path, f"{file_name}_decompressed.mp3")
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 tree_file = tree_file.replace("_compressed", "")
@@ -127,8 +127,8 @@ class CompresorArchivoApp:
             else:
                 raise ValueError("Unsupported file type")
             self.afirmative_message("Descompresion exitosa")
-        # except Exception as e:
-        #     self.error_message(e)
+        except Exception as e:
+            self.error_message(e)
 
 if __name__ == "__main__":
     root = tk.Tk()
