@@ -1,7 +1,6 @@
 import heapq
 import pickle
 from bitarray import bitarray
-import imageio
 
 class HuffmanNode:
     def __init__(self, char, freq):
