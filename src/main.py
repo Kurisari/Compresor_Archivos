@@ -38,10 +38,10 @@ class CompresorArchivoApp:
 
     def seleccionar_archivo(self):
         self.archivo = filedialog.askopenfilename(initialdir="/", title="Seleccionar Archivo",
-                                            filetypes=(("Todos los archivos", "*.*"),
-                                                        ("Archivos de texto", "*.txt"), 
+                                            filetypes=(("Archivos de texto", "*.txt"), 
                                                         ("Archivos de imagen", "*.png;*.jpg;*.jpeg"),
-                                                        ("Archivos de video", "*.mp4;*.avi;*.mkv")))
+                                                        ("Archivos de video", "*.mp4;*.avi;*.mkv"),
+                                                        ("Archivos de audio", "*.mp3;*.wav;*.ogg")))
         self.archivo_a_comprimir.set(self.archivo)
         if self.archivo:
             self.btn_comprimir.config(state="normal")
