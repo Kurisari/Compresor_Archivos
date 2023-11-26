@@ -1,6 +1,33 @@
 import heapq
 import pickle
 from bitarray import bitarray
+import cv2
+import numpy as np
+
+class ColorQuantization:
+    def __init__(self, num_colors=16):
+        self.num_colors = num_colors
+    def quantize_video(self, input_file, output_file):
+        cap = cv2.VideoCapture(input_file)
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        out = cv2.VideoWriter(output_file, fourcc, cap.get(5), (int(cap.get(3)), int(cap.get(4))))
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+            quantized_frame = self.quantize_frame(frame)
+            out.write(quantized_frame)
+        cap.release()
+        out.release()
+    
+    def quantize_frame(self, frame):
+        pixels = frame.reshape((-1, 3))
+        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 20, 1.0)
+        _, labels, centers = cv2.kmeans(np.float32(pixels), self.num_colors, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+        centers = np.uint8(centers)
+        quantized_frame = centers[labels.flatten()]
+        quantized_frame = quantized_frame.reshape(frame.shape)
+        return quantized_frame
 
 class HuffmanNode:
     def __init__(self, char, freq):

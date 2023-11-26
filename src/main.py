@@ -69,7 +69,7 @@ class CompresorArchivoApp:
                     self.huffman_img.serialize_huffman_tree(tree_file)
                 self.huffman_img.compress_img_file(self.archivo, output_file)
             elif file_extension.lower() in [".mp4", ".avi", ".mkv"]:
-                output_file = os.path.join(file_path, f"{file_name}_compressed.crvid")
+                output_file = os.path.join(file_path, f"{file_name}_compressed.mp4")
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 frames = self.huffman.process_video(self.archivo)
                 self.huffman_vid = comprimir.HuffmanTree(frames)
@@ -77,6 +77,8 @@ class CompresorArchivoApp:
                 with open(tree_file, 'wb') as tree_file:
                     self.huffman_vid.serialize_huffman_tree(tree_file)
                 self.huffman_vid.compress_video_file(self.archivo, output_file)
+                # color_quantizer = comprimir.ColorQuantization(num_colors=16)
+                # color_quantizer.quantize_video(self.archivo, output_file)
             elif file_extension.lower() in [".mp3", ".wav", ".ogg"]:
                 output_file = os.path.join(file_path, f"{file_name}_compressed.craud")
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
