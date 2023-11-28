@@ -70,7 +70,7 @@ class CompresorArchivoApp:
                     self.huffman_img.serialize_huffman_tree(tree_file)
                 self.huffman_img.compress_img_file(self.archivo, output_file)
             elif file_extension.lower() in [".mp4", ".avi", ".mkv"]:
-                output_file = os.path.join(file_path, f"{file_name}_compressed.mp4")
+                output_file = os.path.join(file_path, f"{file_name}_compressed.crvid")
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 frames = self.huffman.process_video(self.archivo)
                 self.huffman_vid = comprimir.HuffmanTree(frames)
