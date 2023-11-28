@@ -12,7 +12,7 @@ class CompresorArchivoApp:
     def __init__(self, root):
         self.huffman = comprimir.HuffmanTree()
         self.huffmanDecode = descomprimir.HuffmanDecoder()
-        self.lzw_compressor = comprimir.LZWCompressor()
+        # self.lzw_compressor = comprimir.LZWCompressor()
         self.archivo = ""
         self.root = root
         self.root.title("Compresor de Archivos")
