@@ -9,6 +9,7 @@ from func import comprimir
 from func import descomprimir
 
 class CompresorArchivoApp:
+    # Inicialización de interfaz
     def __init__(self, root):
         self.huffman = comprimir.HuffmanTree()
         self.huffmanDecode = descomprimir.HuffmanDecoder()
@@ -37,6 +38,7 @@ class CompresorArchivoApp:
     def error_message(self, error):
         messagebox.showerror("Error", f"Se produjo un error: {error}")
 
+    # Método para seleccionar archivo y que se habiliten los botones de compresión y descompresión 
     def seleccionar_archivo(self):
         self.archivo = filedialog.askopenfilename(initialdir="/", title="Seleccionar Archivo",
                                             filetypes=(("Archivos de texto", "*.txt;*.crtxt"), 
@@ -48,8 +50,10 @@ class CompresorArchivoApp:
             self.btn_comprimir.config(state="normal")
             self.btn_descomprimir.config(state="normal")
 
+    # Método para comprimir archivos
     def comprimir_archivo(self):
         try:
+            # Obtención del nombre y extensión del archivo
             file_name, file_extension = os.path.splitext(os.path.basename(self.archivo))
             file_path = os.path.dirname(self.archivo)
             if file_extension.lower() == ".txt":
@@ -96,8 +100,10 @@ class CompresorArchivoApp:
         except Exception as e:
             self.error_message(e)
     
+    # Método de descompresión de archivos
     def descomprimir_archivo(self):
         try:
+            # Obtención de nombre de archivo y extensión
             file_name, file_extension = os.path.splitext(os.path.basename(self.archivo))
             file_path = os.path.dirname(self.archivo)
             if file_extension.lower() == ".crtxt":

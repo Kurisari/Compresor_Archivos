@@ -80,6 +80,7 @@ class ColorQuantization:
 #             current_sequence = new_sequence
 #         return ''.join(result)
 
+# Clase para representar nodo de árbol
 class HuffmanNode:
     def __init__(self, char, freq):
         self.char = char
@@ -90,9 +91,11 @@ class HuffmanNode:
     def __lt__(self, other):
         return self.freq < other.freq
     
+    # Función para saber si nodo es hoja
     def is_leaf(self):
         return self.left is None and self.right is None
 
+# Clase para representar el árbol de huffman
 class HuffmanTree:
     def __init__(self, char_freq=None):
         self.huffman_codes = {}
@@ -102,6 +105,7 @@ class HuffmanTree:
             heapq.heapify(self.nodes)
             self.build_huffman_tree()
 
+    # Método para construir el árbol de huffman
     def build_huffman_tree(self):
         while len(self.nodes) > 1:
             left_node = heapq.heappop(self.nodes)
@@ -113,6 +117,7 @@ class HuffmanTree:
         self.root = self.nodes[0]
         self.generate_huffman_codes(self.root)
 
+    # Método que genera los códigos de huffman
     def generate_huffman_codes(self, node, current_code=""):
         if node is None:
             return
@@ -121,9 +126,11 @@ class HuffmanTree:
         self.generate_huffman_codes(node.left, current_code + "0")
         self.generate_huffman_codes(node.right, current_code + "1")
     
+    # Método para serializar árbol de hufmman
     def serialize_huffman_tree(self, file):
         pickle.dump(self.root, file)
     
+    # Métodos para procesar los diferentes tipos de archivos
     def process_text(self, file_path):
         char_freq = {}
         with open(file_path, 'r') as file:
@@ -168,6 +175,7 @@ class HuffmanTree:
                     char_freq[byte] = 1
         return char_freq
 
+    # Mëtodos para comprimir los diferentes tipos de archivos
     def compress_file(self, input_file, output_file):
         with open(input_file, 'r') as file:
             content = file.read()

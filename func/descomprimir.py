@@ -2,6 +2,7 @@ import heapq
 import pickle
 from bitarray import bitarray
 
+# Clase para representar nodo de árbol
 class HuffmanNode:
     def __init__(self, char, freq):
         self.char = char
@@ -15,6 +16,7 @@ class HuffmanNode:
     def is_leaf(self):
         return self.left is None and self.right is None
 
+# Clase para decodificar archivos comprimidos
 class HuffmanDecoder:
     def __init__(self, char_freq=None):
         if char_freq is not None:
@@ -33,12 +35,15 @@ class HuffmanDecoder:
             self.root = None
             self.huffman_codes = {}
     
+    # Método para deserializar el árbol de huffman
     def deserialize_huffman_tree(self, file):
         self.root = pickle.load(file)
         
+    # Método para deserializar árbol de huffman audio
     def deserialize_huffman_tree_aud(self, file):
         self.root = pickle.load(file)
     
+    # Métodos para descomprimir archivos de diferentes casos
     def decompress_file(self, input_file, output_file):
         with open(input_file, 'rb') as file:
             compressed_content = bitarray()
@@ -71,6 +76,7 @@ class HuffmanDecoder:
         with open(output_file, 'wb') as file:
             file.write(decompressed_content)
 
+    # Métodos para decodificar los diferentes tipos de archivos
     def decode_huffman(self, compressed_content):
         current_node = self.root
         decompressed_content = []
