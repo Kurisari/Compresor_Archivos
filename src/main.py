@@ -63,10 +63,11 @@ class CompresorArchivoApp:
     # Método para seleccionar archivo y que se habiliten los botones de compresión y descompresión 
     def seleccionar_archivo(self):
         self.archivo = filedialog.askopenfilename(initialdir="/", title="Seleccionar Archivo",
-                                            filetypes=(("Archivos de texto", "*.txt;*.crtxt"), 
-                                                        ("Archivos de imagen", "*.png;*.jpg;*.jpeg;*.crimg"),
-                                                        ("Archivos de video", "*.mp4;*.avi;*.mkv;*.crvid"),
-                                                        ("Archivos de audio", "*.mp3;*.wav;*.ogg;*.craud")))
+                                            filetypes=(("Todos los archivos", "*.*"),
+                                                        ("Archivos de texto", "*.txt;*.crtxt"), 
+                                                        ("Archivos de imagen", "*.png;*.jpg;*.jpeg;*.crpng;*.crjpg;*.crjpeg"),
+                                                        ("Archivos de video", "*.mp4;*.avi;*.mkv;*.crmp4;*.cravi;*.crmkv"),
+                                                        ("Archivos de audio", "*.mp3;*.wav;*.ogg;*.crmp3;*.crwav;*.crogg")))
         self.archivo_a_comprimir.set(self.archivo)
         if self.archivo:
             self.btn_comprimir.config(state="normal")
@@ -160,35 +161,23 @@ class CompresorArchivoApp:
             # Obtención de nombre de archivo y extensión
             file_name, file_extension = os.path.splitext(os.path.basename(self.archivo))
             file_path = os.path.dirname(self.archivo)
+            output_file, tree_file = self.get_output_and_tree_paths_decompress(file_name, file_extension, file_path)
             if file_extension.lower() == ".crtxt":
-                output_file = os.path.join(file_path, f"{file_name}_decompressed.txt")
-                tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
-                output_file = output_file.replace("_compressed", "")
-                tree_file = tree_file.replace("_compressed", "")
                 self.progress()
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree(tree_file)
                 self.huffmanDecode.decompress_file(self.archivo, output_file)
             elif file_extension.lower() in [".crpng", ".crjpg", ".crjpeg"]:
-                output_file = os.path.join(file_path, f"{file_name}_decompressed.png")
-                tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
-                tree_file = tree_file.replace("_compressed", "")
                 self.progress()
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree(tree_file)
                 self.huffmanDecode.decompress_img_file(self.archivo, output_file)
             elif file_extension.lower() in [".crmp4", ".cravi", ".crmkv"]:
-                output_file = os.path.join(file_path, f"{file_name}_decompressed.mp4")
-                tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
-                tree_file = tree_file.replace("_compressed", "")
                 self.progress()
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree(tree_file)
                 self.huffmanDecode.decompress_vid_file(self.archivo, output_file)
             elif file_extension.lower() in [".crmp3", ".crwav", ".crogg"]:
-                output_file = os.path.join(file_path, f"{file_name}_decompressed.mp3")
-                tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
-                tree_file = tree_file.replace("_compressed", "")
                 self.progress()
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree_aud(tree_file)
@@ -199,6 +188,14 @@ class CompresorArchivoApp:
             self.hide_progress_bar()
         except Exception as e:
             self.error_message(e)
+    
+    def get_output_and_tree_paths_decompress(self, file_name, file_extension, file_path):
+        decompressed_suffix = "_decompressed"
+        extension = file_extension.replace(".cr", ".")
+        output_file = os.path.join(file_path, f"{file_name}{decompressed_suffix}{extension}")
+        tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
+        tree_file = tree_file.replace("_compressed", "")
+        return output_file, tree_file
 
 if __name__ == "__main__":
     root = tk.Tk()
