@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import os
 import sys
+import threading
 script_dir = os.getcwd()
 func_dir = os.path.join(script_dir)
 sys.path.append(func_dir)
@@ -17,7 +18,7 @@ class CompresorArchivoApp:
         self.archivo = ""
         self.root = root
         self.root.title("Compresor de Archivos")
-        root.iconbitmap(r"H:/My Drive/programacion/Compresor_Archivos/Compresor_Archivos/src/icon.ico")
+        root.iconbitmap(r"src\icon.ico")
         self.root.geometry("300x200")
         self.archivo_a_comprimir = tk.StringVar()
         self.lbl_archivo = tk.Label(root, text="Selecciona el archivo a comprimir:")
@@ -52,6 +53,12 @@ class CompresorArchivoApp:
 
     # Método para comprimir archivos
     def comprimir_archivo(self):
+        try:
+            threading.Thread(target=self.ejecutar_compresion).start()
+        except Exception as e:
+            self.error_message(e)
+    
+    def ejecutar_compresion(self):
         try:
             # Obtención del nombre y extensión del archivo
             file_name, file_extension = os.path.splitext(os.path.basename(self.archivo))
