@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, ttk
 import os
 import sys
 import threading
@@ -31,6 +31,23 @@ class CompresorArchivoApp:
         self.btn_comprimir.pack(side="left", padx=10)
         self.btn_descomprimir = tk.Button(root, text="Descomprimir Archivo", command=self.descomprimir_archivo, state="disabled")
         self.btn_descomprimir.pack(side="right", padx=10)
+        self.progress_window = None
+        self.progress_bar = None
+
+    def show_progress_bar(self):
+        self.progress_window = tk.Toplevel(self.root)
+        self.progress_window.title("Progreso de Compresión")
+        self.progress_window.geometry("300x50")
+        self.progress_bar = ttk.Progressbar(self.progress_window, orient="horizontal", length=280, mode="determinate")
+        self.progress_bar.pack(pady=10)
+        
+    def hide_progress_bar(self):
+        if self.progress_window:
+            self.progress_window.destroy()
+
+    def update_progress_bar(self):
+        self.progress_bar.stop()
+        self.hide_progress_bar()
 
     def afirmative_message(self, message):
         messagebox.showinfo("Éxito", message)
@@ -53,8 +70,10 @@ class CompresorArchivoApp:
     # Método para comprimir archivos
     def comprimir_archivo(self):
         try:
+            self.show_progress_bar()
             threading.Thread(target=self.ejecutar_compresion).start()
         except Exception as e:
+            self.hide_progress_bar()
             self.error_message(e)
     
     def ejecutar_compresion(self):
@@ -85,6 +104,12 @@ class CompresorArchivoApp:
                 frames = self.huffman.process_video(self.archivo)
                 self.huffman_vid = comprimir.HuffmanTree(frames)
                 self.huffman_vid.generate_huffman_codes(self.huffman_vid.root)
+                # Simular un progreso con un bucle
+                for _ in range(99):
+                    self.progress_bar.step(1)
+                    self.progress_bar.update_idletasks()
+                    # Simular una pausa para observar la barra de progreso
+                    self.progress_bar.after(50)
                 with open(tree_file, 'wb') as tree_file:
                     self.huffman_vid.serialize_huffman_tree(tree_file)
                 self.huffman_vid.compress_video_file(self.archivo, output_file)
@@ -99,6 +124,7 @@ class CompresorArchivoApp:
                 self.huffman_audio.compress_audio_file(self.archivo, output_file)
             else:
                 raise ValueError("Unsupported file type")
+            self.update_progress_bar()
             self.afirmative_message("Compresion exitosa")
         except Exception as e:
             self.error_message(e)
