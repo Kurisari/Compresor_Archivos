@@ -1,8 +1,6 @@
 import heapq
 import pickle
 from bitarray import bitarray
-import cv2
-import numpy as np
 
 # Clase para representar nodo de árbol
 class HuffmanNode:
