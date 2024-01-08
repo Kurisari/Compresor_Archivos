@@ -4,9 +4,11 @@ import os
 import sys
 import threading
 from queue import Queue
+
 script_dir = os.getcwd()
 func_dir = os.path.join(script_dir)
 sys.path.append(func_dir)
+
 from func import comprimir
 from func import descomprimir
 
@@ -42,7 +44,7 @@ class CompresorArchivoApp:
         self.progress_window.geometry("300x50")
         self.progress_bar = ttk.Progressbar(self.progress_window, orient="horizontal", length=280, mode="determinate")
         self.progress_bar.pack(pady=10)
-        
+
     def hide_progress_bar(self):
         if self.progress_window:
             self.progress_window.destroy()
@@ -79,15 +81,14 @@ class CompresorArchivoApp:
         except Exception as e:
             self.hide_progress_bar()
             self.error_message(e)
-    
+
     def ejecutar_compresion(self):
         try:
             # Obtención del nombre y extensión del archivo
             file_name, file_extension = os.path.splitext(os.path.basename(self.archivo))
             file_path = os.path.dirname(self.archivo)
+            output_file, tree_file = self.get_output_and_tree_paths(file_name, file_extension, file_path)
             if file_extension.lower() == ".txt":
-                output_file = os.path.join(file_path, f"{file_name}_compressed.crtxt")
-                tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 self.huffman.process_text(self.archivo)
                 self.huffman.generate_huffman_codes(self.huffman.root)
                 self.progress()
@@ -95,8 +96,6 @@ class CompresorArchivoApp:
                     self.huffman.serialize_huffman_tree(tree_file)
                 self.huffman.compress_file(self.archivo, output_file)
             elif file_extension.lower() in [".png", ".jpg", ".jpeg"]:
-                output_file = os.path.join(file_path, f"{file_name}_compressed.crimg")
-                tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 char_freq = self.huffman.process_image(self.archivo)
                 self.huffman_img = comprimir.HuffmanTree(char_freq)
                 self.huffman_img.generate_huffman_codes(self.huffman_img.root)
@@ -105,8 +104,6 @@ class CompresorArchivoApp:
                     self.huffman_img.serialize_huffman_tree(tree_file)
                 self.huffman_img.compress_img_file(self.archivo, output_file)
             elif file_extension.lower() in [".mp4", ".avi", ".mkv"]:
-                output_file = os.path.join(file_path, f"{file_name}_compressed.crvid")
-                tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 frames = self.huffman.process_video(self.archivo)
                 self.huffman_vid = comprimir.HuffmanTree(frames)
                 self.huffman_vid.generate_huffman_codes(self.huffman_vid.root)
@@ -115,8 +112,6 @@ class CompresorArchivoApp:
                     self.huffman_vid.serialize_huffman_tree(tree_file)
                 self.huffman_vid.compress_video_file(self.archivo, output_file)
             elif file_extension.lower() in [".mp3", ".wav", ".ogg"]:
-                output_file = os.path.join(file_path, f"{file_name}_compressed.craud")
-                tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 char_freq = self.huffman.process_audio(self.archivo)
                 self.huffman_audio = comprimir.HuffmanTree(char_freq)
                 self.huffman_audio.generate_huffman_codes(self.huffman_audio.root)
@@ -130,19 +125,26 @@ class CompresorArchivoApp:
             self.hide_progress_bar()
         except Exception as e:
             self.error_message(e)
-    
+
     def progress(self):
         for progress_value in range(100):
             self.queue.put(progress_value)  # Envía el valor de progreso a la cola
             self.progress_bar.update_idletasks()
             self.progress_bar.after(1)
-    
+
+    def get_output_and_tree_paths(self, file_name, file_extension, file_path):
+        compressed_suffix = "_compressed"
+        custom_extension = file_extension.replace(".", ".cr")
+        output_file = os.path.join(file_path, f"{file_name}{compressed_suffix}{custom_extension}")
+        tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
+        return output_file, tree_file
+
     def check_queue(self):
         while not self.queue.empty():
             progress_value = self.queue.get()
             self.update_progress_bar(progress_value)
         self.root.after(100, self.check_queue)
-    
+
     # Método de descompresión de archivos
     def descomprimir_archivo(self):
         try:
@@ -152,7 +154,7 @@ class CompresorArchivoApp:
         except Exception as e:
             self.hide_progress_bar()
             self.error_message(e)
-    
+
     def ejecutar_descompresion(self):
         try:
             # Obtención de nombre de archivo y extensión
@@ -167,7 +169,7 @@ class CompresorArchivoApp:
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree(tree_file)
                 self.huffmanDecode.decompress_file(self.archivo, output_file)
-            elif file_extension.lower() == ".crimg":
+            elif file_extension.lower() in [".crpng", ".crjpg", ".crjpeg"]:
                 output_file = os.path.join(file_path, f"{file_name}_decompressed.png")
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 tree_file = tree_file.replace("_compressed", "")
@@ -175,7 +177,7 @@ class CompresorArchivoApp:
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree(tree_file)
                 self.huffmanDecode.decompress_img_file(self.archivo, output_file)
-            elif file_extension.lower() == ".crvid":
+            elif file_extension.lower() in [".crmp4", ".cravi", ".crmkv"]:
                 output_file = os.path.join(file_path, f"{file_name}_decompressed.mp4")
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 tree_file = tree_file.replace("_compressed", "")
@@ -183,7 +185,7 @@ class CompresorArchivoApp:
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree(tree_file)
                 self.huffmanDecode.decompress_vid_file(self.archivo, output_file)
-            elif file_extension.lower() == ".craud":
+            elif file_extension.lower() in [".crmp3", ".crwav", ".crogg"]:
                 output_file = os.path.join(file_path, f"{file_name}_decompressed.mp3")
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 tree_file = tree_file.replace("_compressed", "")
