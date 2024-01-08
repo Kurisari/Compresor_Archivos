@@ -3,6 +3,7 @@ from tkinter import filedialog, messagebox, ttk
 import os
 import sys
 import threading
+from queue import Queue
 script_dir = os.getcwd()
 func_dir = os.path.join(script_dir)
 sys.path.append(func_dir)
@@ -15,6 +16,7 @@ class CompresorArchivoApp:
         self.huffman = comprimir.HuffmanTree()
         self.huffmanDecode = descomprimir.HuffmanDecoder()
         self.archivo = ""
+        self.queue = Queue()
         self.root = root
         self.root.title("Compresor de Archivos")
         root.iconbitmap(r"src\icon.ico")
@@ -45,9 +47,10 @@ class CompresorArchivoApp:
         if self.progress_window:
             self.progress_window.destroy()
 
-    def update_progress_bar(self):
-        self.progress_bar.stop()
-        self.hide_progress_bar()
+    def update_progress_bar(self, value):
+        self.progress_bar['value'] = value
+        if value >= 100:
+            self.hide_progress_bar()
 
     def afirmative_message(self, message):
         messagebox.showinfo("Éxito", message)
@@ -72,6 +75,7 @@ class CompresorArchivoApp:
         try:
             self.show_progress_bar()
             threading.Thread(target=self.ejecutar_compresion).start()
+            self.root.after(100, self.check_queue)
         except Exception as e:
             self.hide_progress_bar()
             self.error_message(e)
@@ -86,6 +90,7 @@ class CompresorArchivoApp:
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 self.huffman.process_text(self.archivo)
                 self.huffman.generate_huffman_codes(self.huffman.root)
+                self.progress()
                 with open(tree_file, 'wb') as tree_file:
                     self.huffman.serialize_huffman_tree(tree_file)
                 self.huffman.compress_file(self.archivo, output_file)
@@ -95,6 +100,7 @@ class CompresorArchivoApp:
                 char_freq = self.huffman.process_image(self.archivo)
                 self.huffman_img = comprimir.HuffmanTree(char_freq)
                 self.huffman_img.generate_huffman_codes(self.huffman_img.root)
+                self.progress()
                 with open(tree_file, 'wb') as tree_file:
                     self.huffman_img.serialize_huffman_tree(tree_file)
                 self.huffman_img.compress_img_file(self.archivo, output_file)
@@ -104,12 +110,7 @@ class CompresorArchivoApp:
                 frames = self.huffman.process_video(self.archivo)
                 self.huffman_vid = comprimir.HuffmanTree(frames)
                 self.huffman_vid.generate_huffman_codes(self.huffman_vid.root)
-                # Simular un progreso con un bucle
-                for _ in range(99):
-                    self.progress_bar.step(1)
-                    self.progress_bar.update_idletasks()
-                    # Simular una pausa para observar la barra de progreso
-                    self.progress_bar.after(50)
+                self.progress()
                 with open(tree_file, 'wb') as tree_file:
                     self.huffman_vid.serialize_huffman_tree(tree_file)
                 self.huffman_vid.compress_video_file(self.archivo, output_file)
@@ -119,18 +120,40 @@ class CompresorArchivoApp:
                 char_freq = self.huffman.process_audio(self.archivo)
                 self.huffman_audio = comprimir.HuffmanTree(char_freq)
                 self.huffman_audio.generate_huffman_codes(self.huffman_audio.root)
+                self.progress()
                 with open(tree_file, 'wb') as tree_file:
                     self.huffman_audio.serialize_huffman_tree(tree_file)
                 self.huffman_audio.compress_audio_file(self.archivo, output_file)
             else:
                 raise ValueError("Unsupported file type")
-            self.update_progress_bar()
             self.afirmative_message("Compresion exitosa")
+            self.hide_progress_bar()
         except Exception as e:
             self.error_message(e)
     
+    def progress(self):
+        for progress_value in range(100):
+            self.queue.put(progress_value)  # Envía el valor de progreso a la cola
+            self.progress_bar.update_idletasks()
+            self.progress_bar.after(1)
+    
+    def check_queue(self):
+        while not self.queue.empty():
+            progress_value = self.queue.get()
+            self.update_progress_bar(progress_value)
+        self.root.after(100, self.check_queue)
+    
     # Método de descompresión de archivos
     def descomprimir_archivo(self):
+        try:
+            self.show_progress_bar()
+            threading.Thread(target=self.ejecutar_descompresion).start()
+            self.root.after(100, self.check_queue)
+        except Exception as e:
+            self.hide_progress_bar()
+            self.error_message(e)
+    
+    def ejecutar_descompresion(self):
         try:
             # Obtención de nombre de archivo y extensión
             file_name, file_extension = os.path.splitext(os.path.basename(self.archivo))
@@ -140,6 +163,7 @@ class CompresorArchivoApp:
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 output_file = output_file.replace("_compressed", "")
                 tree_file = tree_file.replace("_compressed", "")
+                self.progress()
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree(tree_file)
                 self.huffmanDecode.decompress_file(self.archivo, output_file)
@@ -147,6 +171,7 @@ class CompresorArchivoApp:
                 output_file = os.path.join(file_path, f"{file_name}_decompressed.png")
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 tree_file = tree_file.replace("_compressed", "")
+                self.progress()
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree(tree_file)
                 self.huffmanDecode.decompress_img_file(self.archivo, output_file)
@@ -154,6 +179,7 @@ class CompresorArchivoApp:
                 output_file = os.path.join(file_path, f"{file_name}_decompressed.mp4")
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 tree_file = tree_file.replace("_compressed", "")
+                self.progress()
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree(tree_file)
                 self.huffmanDecode.decompress_vid_file(self.archivo, output_file)
@@ -161,12 +187,14 @@ class CompresorArchivoApp:
                 output_file = os.path.join(file_path, f"{file_name}_decompressed.mp3")
                 tree_file = os.path.join(file_path, f"{file_name}_huffman_tree.txt")
                 tree_file = tree_file.replace("_compressed", "")
+                self.progress()
                 with open(tree_file, 'rb') as tree_file:
                     self.huffmanDecode.deserialize_huffman_tree_aud(tree_file)
                 self.huffmanDecode.decompress_audio_file(self.archivo, output_file)
             else:
                 raise ValueError("Unsupported file type")
             self.afirmative_message("Descompresion exitosa")
+            self.hide_progress_bar()
         except Exception as e:
             self.error_message(e)
 
