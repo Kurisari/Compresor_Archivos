@@ -118,13 +118,13 @@ class CompresorArchivoApp:
             output_file, tree_file = self.get_output_and_tree_paths(file_name, file_extension, file_path)
 
             if file_extension.lower() == ".txt":
-                self.process_text_file(file_name, file_extension, file_path, output_file, tree_file)
+                self.process_text_file(output_file, tree_file)
             elif file_extension.lower() in [".png", ".jpg", ".jpeg"]:
-                self.process_image_file(file_name, file_extension, file_path, output_file, tree_file)
+                self.process_image_file(output_file, tree_file)
             elif file_extension.lower() in [".mp4", ".avi", ".mkv"]:
-                self.process_video_file(file_name, file_extension, file_path, output_file, tree_file)
+                self.process_video_file(output_file, tree_file)
             elif file_extension.lower() in [".mp3", ".wav", ".ogg"]:
-                self.process_audio_file(file_name, file_extension, file_path, output_file, tree_file)
+                self.process_audio_file(output_file, tree_file)
             else:
                 raise ValueError("Unsupported file type")
 
@@ -133,7 +133,7 @@ class CompresorArchivoApp:
         except Exception as e:
             self.error_message(e)
 
-    def process_text_file(self, file_name, file_extension, file_path, output_file, tree_file):
+    def process_text_file(self, output_file, tree_file):
         self.huffman.process_text(self.archivo)
         self.huffman.generate_huffman_codes(self.huffman.root)
         self.progress()
@@ -141,7 +141,7 @@ class CompresorArchivoApp:
             self.huffman.serialize_huffman_tree(tree_file)
         self.huffman.compress_file(self.archivo, output_file)
 
-    def process_image_file(self, file_name, file_extension, file_path, output_file, tree_file):
+    def process_image_file(self, output_file, tree_file):
         char_freq = self.huffman.process_image(self.archivo)
         self.huffman_img = comprimir.HuffmanTree(char_freq)
         self.huffman_img.generate_huffman_codes(self.huffman_img.root)
@@ -150,7 +150,7 @@ class CompresorArchivoApp:
             self.huffman_img.serialize_huffman_tree(tree_file)
         self.huffman_img.compress_img_file(self.archivo, output_file)
 
-    def process_video_file(self, file_name, file_extension, file_path, output_file, tree_file):
+    def process_video_file(self, output_file, tree_file):
         frames = self.huffman.process_video(self.archivo)
         self.huffman_vid = comprimir.HuffmanTree(frames)
         self.huffman_vid.generate_huffman_codes(self.huffman_vid.root)
@@ -159,7 +159,7 @@ class CompresorArchivoApp:
             self.huffman_vid.serialize_huffman_tree(tree_file)
         self.huffman_vid.compress_video_file(self.archivo, output_file)
 
-    def process_audio_file(self, file_name, file_extension, file_path, output_file, tree_file):
+    def process_audio_file(self, output_file, tree_file):
         char_freq = self.huffman.process_audio(self.archivo)
         self.huffman_audio = comprimir.HuffmanTree(char_freq)
         self.huffman_audio.generate_huffman_codes(self.huffman_audio.root)
