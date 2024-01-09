@@ -187,8 +187,9 @@ class CompresorArchivoApp:
             self.afirmative_message("Descompresion exitosa")
             self.hide_progress_bar()
         except Exception as e:
+            self.hide_progress_bar()
             self.error_message(e)
-    
+
     def get_output_and_tree_paths_decompress(self, file_name, file_extension, file_path):
         decompressed_suffix = "_decompressed"
         extension = file_extension.replace(".cr", ".")
