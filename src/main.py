@@ -4,6 +4,7 @@ import os
 import sys
 import threading
 from queue import Queue
+import configparser
 
 script_dir = os.getcwd()
 func_dir = os.path.join(script_dir)
@@ -17,7 +18,7 @@ class CompresorArchivoApp:
     def __init__(self, root):
         self.huffman = comprimir.HuffmanTree()
         self.huffmanDecode = descomprimir.HuffmanDecoder()
-        self.last_folder = ""
+        self.last_folder = self.load_last_folder()
         self.archivo = ""
         self.queue = Queue()
         self.root = root
@@ -61,6 +62,17 @@ class CompresorArchivoApp:
     def error_message(self, error):
         messagebox.showerror("Error", f"Se produjo un error: {error}")
 
+    def load_last_folder(self):
+        config = configparser.ConfigParser()
+        config.read("config.ini")
+        return config.get("Settings", "last_folder", fallback="")
+
+    def save_last_folder(self):
+        config = configparser.ConfigParser()
+        config["Settings"] = {"last_folder": self.last_folder}
+        with open("config.ini", "w") as config_file:
+            config.write(config_file)
+
     # Método para seleccionar archivo y que se habiliten los botones de compresión y descompresión 
     def seleccionar_archivo(self):
         initial_dir = self.last_folder if self.last_folder else "/"
@@ -73,6 +85,7 @@ class CompresorArchivoApp:
         self.archivo_a_comprimir.set(self.archivo)
         if self.archivo:
             self.last_folder = os.path.dirname(self.archivo)
+            self.save_last_folder()
             self.archivo_a_comprimir.set(self.archivo)
             self.btn_comprimir.config(state="normal")
             self.btn_descomprimir.config(state="normal")
