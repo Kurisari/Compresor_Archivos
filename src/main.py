@@ -19,6 +19,8 @@ class CompresorArchivoApp:
         self.huffman = comprimir.HuffmanTree()
         self.huffmanDecode = descomprimir.HuffmanDecoder()
         self.last_folder = self.load_last_folder()
+        self.compression_history = self.load_history("compression_history")
+        self.decompression_history = self.load_history("decompression_history")
         self.archivo = ""
         self.queue = Queue()
         self.root = root
@@ -82,7 +84,30 @@ class CompresorArchivoApp:
 
     def save_last_folder(self):
         config = configparser.ConfigParser()
-        config["Settings"] = {"last_folder": self.last_folder}
+        config.read("config.ini")
+        config.set("Settings", "last_folder", self.last_folder)
+        with open("config.ini", "w") as config_file:
+            config.write(config_file)
+
+    def load_history(self, key):
+        config = configparser.ConfigParser()
+        config.read("config.ini")
+        history_str = config.get("Settings", key, fallback="")
+        return history_str.split(";") if history_str else []
+
+    def add_to_history(self, key, item):
+        history = self.load_history(key)
+        history.insert(0, item)
+        history = history[:5]  # Limitar el historial a, por ejemplo, 5 elementos
+        history_str = ";".join(history)
+        self.save_history(key, history_str)
+
+    def save_history(self, key, history_str):
+        config = configparser.ConfigParser()
+        config.read("config.ini")
+        # Actualizar la configuración existente
+        config.set("Settings", key, history_str)
+        # Guardar la configuración actualizada
         with open("config.ini", "w") as config_file:
             config.write(config_file)
 
@@ -107,6 +132,7 @@ class CompresorArchivoApp:
             self.show_progress_bar()
             threading.Thread(target=self.ejecutar_compresion).start()
             self.root.after(100, self.check_queue)
+            self.add_to_history("compression_history", self.archivo)
         except Exception as e:
             self.hide_progress_bar()
             self.error_message(e)
@@ -173,6 +199,7 @@ class CompresorArchivoApp:
             self.show_progress_bar()
             threading.Thread(target=self.ejecutar_descompresion).start()
             self.root.after(100, self.check_queue)
+            self.add_to_history("decompression_history", self.archivo)
         except Exception as e:
             self.hide_progress_bar()
             self.error_message(e)
