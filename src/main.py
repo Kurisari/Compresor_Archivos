@@ -17,6 +17,7 @@ class CompresorArchivoApp:
     def __init__(self, root):
         self.huffman = comprimir.HuffmanTree()
         self.huffmanDecode = descomprimir.HuffmanDecoder()
+        self.last_folder = ""
         self.archivo = ""
         self.queue = Queue()
         self.root = root
@@ -62,7 +63,8 @@ class CompresorArchivoApp:
 
     # Método para seleccionar archivo y que se habiliten los botones de compresión y descompresión 
     def seleccionar_archivo(self):
-        self.archivo = filedialog.askopenfilename(initialdir="/", title="Seleccionar Archivo",
+        initial_dir = self.last_folder if self.last_folder else "/"
+        self.archivo = filedialog.askopenfilename(initialdir=initial_dir, title="Seleccionar Archivo",
                                             filetypes=(("Todos los archivos", "*.*"),
                                                         ("Archivos de texto", "*.txt;*.crtxt"), 
                                                         ("Archivos de imagen", "*.png;*.jpg;*.jpeg;*.crpng;*.crjpg;*.crjpeg"),
@@ -70,6 +72,8 @@ class CompresorArchivoApp:
                                                         ("Archivos de audio", "*.mp3;*.wav;*.ogg;*.crmp3;*.crwav;*.crogg")))
         self.archivo_a_comprimir.set(self.archivo)
         if self.archivo:
+            self.last_folder = os.path.dirname(self.archivo)
+            self.archivo_a_comprimir.set(self.archivo)
             self.btn_comprimir.config(state="normal")
             self.btn_descomprimir.config(state="normal")
 
