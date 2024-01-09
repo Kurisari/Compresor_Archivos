@@ -45,9 +45,9 @@ The application supports the compression of the following file types:
 The aplication supports the descompression of the following file types:
 
 - Text files: `.crtxt`
-- Image files: `.crimg`
-- Video files: `.crvid`
-- Audio files: `.craud`
+- Image files: `.crpng`, `.crjpg`, `.crjpeg`
+- Video files: `.crmp4`, `.cravi`, `.crmkv`
+- Audio files: `.crmp3`, `.crwav`, `.crogg`
 
 The output file extensions are derived from the first two letters of my name, Cristian.
 
